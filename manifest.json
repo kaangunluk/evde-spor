@@ -1,21 +1,21 @@
 {
-  "name": "Spor Günlüğüm",
-  "short_name": "Spor Günlüğüm",
-  "start_url": "./index.html",
+  "name": "Evde Spor",
+  "short_name": "Spor",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0b0f19",
   "theme_color": "#10b981",
-  "description": "Kişisel spor ve beslenme takibi uygulamanız.",
+  "description": "Evde spor ve beslenme takip uygulaması.",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjMTBiOTgxIj48cGF0aCBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMCAwLTE5OS04OS0xOTktMTk5UzE0NiA1NyAyNTYgNTdzMTk5IDg5 199 199tODktMTk5IDE5OS0xOTl6Ii8+PC9zdmc+",
+      "src": "https://cdn-icons-png.flaticon.com/512/4723/4723966.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjMTBiOTgxIj48cGF0aCBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMCAwLTE5OS04OS0xOTktMTk5UzE0NiA1NyAyNTYgNTdzMTk5IDg5 199 199tODktMTk5IDE5OS0xOTl6Ii8+PC9zdmc+",
+      "src": "https://cdn-icons-png.flaticon.com/512/4723/4723966.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }

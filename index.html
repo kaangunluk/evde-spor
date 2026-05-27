@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Evde Spor">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/96/dumbbell.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Evde Spor - Dambıl Programı</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --nav-bg: rgba(11,15,25,0.85);
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-light); min-height: 100vh; display: flex; justify-content: center; background-image: radial-gradient(circle at 15% 50%, rgba(16,185,129,0.08), transparent 25%), radial-gradient(circle at 85% 30%, rgba(59,130,246,0.08), transparent 25%); }
+        #app { width: 100%; max-width: 480px; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
+        .view { display: none; flex-direction: column; width: 100%; padding: 2rem 1.5rem; animation: fadeIn 0.4s ease-out; }
+        .view.active { display: flex; }
+        #view-main { padding: 0 0 80px 0; }
+        .tab-content { display: none; flex-direction: column; width: 100%; padding: 2rem 1.5rem; animation: slideIn 0.3s ease-out; }
+        .tab-content.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        h1 { font-weight: 800; font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-weight: 600; font-size: 1.3rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .btn { background: var(--primary); color: #fff; border: none; padding: 1rem; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; transition: all 0.2s; }
+        .btn:active { transform: scale(0.97); }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .input-group input, .input-group select { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 1rem; border-radius: 12px; font-size: 1rem; }
+        .pin-dots { display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; }
+        .dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--primary); }
+        .dot.filled { background: var(--primary); }
+        .pin-pad { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: auto; }
+        .pin-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; font-size: 1.5rem; border-radius: 50%; aspect-ratio:1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: 70px; background: var(--nav-bg); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; cursor: pointer; flex:1; }
+        .nav-item i { font-size: 1.4rem; }
+        .nav-item.active { color: var(--primary); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .streak-badge { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--accent); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 800; display: flex; gap: 0.5rem; }
+        .progress-card { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(59,130,246,0.15)); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .progress-bar-bg { width: 100%; height: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; margin-top: 1rem; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 5px; width: 0%; }
+        .calendar-row { display: flex; justify-content: space-between; margin-top: 1rem; }
+        .cal-day { width: 40px; height: 50px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; }
+        .cal-day.completed { background: rgba(16,185,129,0.2); border-color: var(--primary); }
+        .task-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; }
+        .task-card { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 16px; background: var(--glass-bg); border: 1px solid var(--glass-border); cursor: pointer; }
+        .task-card.completed { border-color: var(--primary); background: rgba(16,185,129,0.05); }
+        .task-card.completed .task-title { text-decoration: line-through; color: var(--text-muted); }
+        .task-content { flex:1; }
+        .task-title { font-weight: 600; }
+        .task-desc { font-size: 0.8rem; color: var(--text-muted); }
+        .check-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; }
+        .task-card.completed .check-circle { background: var(--primary); border-color: var(--primary); }
+        .check-circle i { opacity: 0; color: white; }
+        .task-card.completed .check-circle i { opacity: 1; }
+        .info-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .workout-session { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); z-index:200; display: none; flex-direction: column; overflow-y: auto; padding: 1.5rem; }
+        .workout-session.active { display: flex; }
+        .exercise-img { width:100%; height:200px; object-fit:cover; border-radius:20px; margin:1rem 0; background:#1a1a2e; }
+        .rep-display { font-size: 2rem; font-weight:800; text-align:center; color: var(--accent); margin:0.5rem 0; }
+        .action-buttons { display:flex; gap:1rem; margin:1rem 0; }
+        .btn-done { flex:1; background: var(--success); color:white; padding:1rem; border:none; border-radius:16px; font-weight:bold; cursor:pointer; }
+        .btn-fail { flex:1; background: var(--danger); color:white; padding:1rem; border:none; border-radius:16px; font-weight:bold; cursor:pointer; }
+        .rest-timer { text-align:center; background: rgba(59,130,246,0.2); padding:1rem; border-radius:20px; margin-top:1rem; }
+        .rest-timer h3 { font-size:1.5rem; margin-bottom:0.5rem; }
+        .warmup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:250; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+        .warmup-overlay.hide { display:none; }
+        .warmup-timer { font-size:4rem; font-weight:800; color:var(--primary); margin:1rem; }
+        .reminder-card { background: rgba(59,130,246,0.1); border-radius:16px; padding:1rem; display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:300; display:none; align-items:center; justify-content:center; }
+        .modal-overlay.active { display:flex; }
+        .modal-content { background: var(--bg-color); border-radius:20px; width:90%; max-width:350px; overflow:hidden; }
+        .modal-image { width:100%; height:180px; object-fit:cover; }
+        .toggle-switch { position:relative; display:inline-block; width:50px; height:28px; }
+        .toggle-switch input { opacity:0; width:0; height:0; }
+        .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:rgba(255,255,255,0.1); border-radius:34px; }
+        .slider:before { position:absolute; content:""; height:20px; width:20px; left:4px; bottom:3px; background-color:white; border-radius:50%; transition:0.2s; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform:translateX(20px); }
+        #confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:400; }
+        .workout-counter { background: var(--secondary); border-radius: 20px; padding: 0.5rem 1rem; text-align: center; margin-bottom: 1rem; font-weight: bold; }
+        .countdown-box { text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(59,130,246,0.2)); border-radius: 30px; margin-top: 2rem; }
+        .countdown-number { font-size: 3rem; font-weight: 800; color: var(--accent); }
+    </style>
+</head>
+<body>
+    <canvas id="confetti"></canvas>
+    <div id="app">
+        <!-- LOGIN -->
+        <div id="view-login" class="view active">
+            <div style="text-align:center; margin-top:2rem;">
+                <i class="fa-solid fa-dumbbell" style="font-size:3rem; color:var(--primary);"></i>
+                <h1>Evde Spor</h1>
+                <p>28 Mayıs 2026'da başlıyor! 🔥</p>
+                <p style="font-size:0.8rem; margin-top:1rem">PIN ile giriş yap</p>
+            </div>
+            <div class="pin-dots" id="pin-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="pin-pad">
+                <div class="pin-btn" onclick="addPin('1')">1</div><div class="pin-btn" onclick="addPin('2')">2</div><div class="pin-btn" onclick="addPin('3')">3</div>
+                <div class="pin-btn" onclick="addPin('4')">4</div><div class="pin-btn" onclick="addPin('5')">5</div><div class="pin-btn" onclick="addPin('6')">6</div>
+                <div class="pin-btn" onclick="addPin('7')">7</div><div class="pin-btn" onclick="addPin('8')">8</div><div class="pin-btn" onclick="addPin('9')">9</div>
+                <div class="pin-btn transparent"></div><div class="pin-btn" onclick="addPin('0')">0</div><div class="pin-btn" onclick="deletePin()"><i class="fa-solid fa-delete-left"></i></div>
+            </div>
+        </div>
+
+        <!-- ONBOARDING -->
+        <div id="view-onboarding" class="view">
+            <h1>Hoş Geldin! 💪</h1>
+            <p>Günde 2 antrenman, 28 Mayıs'ta başlıyoruz!</p>
+            <div class="glass-card">
+                <div class="input-group"><label>Doğum Tarihi</label><input type="date" id="birthday" value="2013-05-28"></div>
+                <div class="input-group"><label>Boy (cm)</label><input type="number" id="height" value="152"></div>
+                <div class="input-group"><label>Kilo (kg)</label><input type="number" id="weight" value="49"></div>
+                <div class="input-group"><label>Hedef</label><select id="goal"><option value="all" selected>Hepsi (Dambıl + Vücut ağırlığı)</option></select></div>
+                <button class="btn" onclick="saveProfile()">Başla <i class="fa-solid fa-play"></i></button>
+            </div>
+        </div>
+
+        <!-- MAIN -->
+        <div id="view-main" class="view">
+            <div id="tab-home" class="tab-content active">
+                <div class="header">
+                    <div><h1 style="font-size:1.6rem" id="greeting-text">Merhaba!</h1><p>Bugünkü hedeflerin</p></div>
+                    <div class="streak-badge"><i class="fa-solid fa-fire"></i><span id="streak-count">0</span></div>
+                </div>
+                <div id="start-countdown" class="countdown-box" style="display:none">
+                    <i class="fa-solid fa-calendar-check" style="font-size:2rem"></i>
+                    <h2>Başlangıca Kalan Süre</h2>
+                    <div class="countdown-number" id="countdown-days">0</div>
+                    <p>gün</p>
+                    <p style="font-size:0.8rem">28 Mayıs 2026'da antrenmanlar başlıyor!</p>
+                </div>
+                <div id="workout-content" style="display:none">
+                    <div class="workout-counter" id="workout-counter-display">🏋️ Bugün 0 / 2 antrenman tamamlandı</div>
+                    <div class="progress-card">
+                        <div style="display:flex; justify-content:space-between"><span id="progress-text">0/0</span><span id="progress-percent">0%</span></div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+                        <div class="calendar-wrap"><h3>📅 Son 7 Gün</h3><div class="calendar-row" id="calendar-row"></div></div>
+                    </div>
+                    <div class="reminder-card">
+                        <i class="fa-solid fa-bell"></i>
+                        <div><strong>⏰ Her 30 dk'da antrenman hatırlatıcısı</strong><br>Günde 2 antrenman hedefin</div>
+                    </div>
+                    <div class="glass-card" style="text-align:center; border-color:var(--primary)" onclick="startFullWorkout()">
+                        <i class="fa-solid fa-play-circle" style="font-size:2rem"></i>
+                        <h3>🏋️ Antrenmana Başla</h3>
+                        <p>16 hareket, her set sonrası 90 sn dinlenme</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-workouts" class="tab-content">
+                <h1>Egzersizler <i class="fa-solid fa-dumbbell"></i></h1>
+                <div id="workouts-content-area">
+                    <div class="countdown-box" style="display:none" id="workouts-countdown">Başlangıç bekleniyor...</div>
+                    <div class="task-list" id="workouts-container" style="display:none"></div>
+                    <button id="workout-start-btn" class="btn" style="display:none" onclick="startFullWorkout()"><i class="fa-solid fa-play"></i> Antrenman Yap</button>
+                </div>
+            </div>
+
+            <div id="tab-nutrition" class="tab-content">
+                <h1>Beslenme <i class="fa-solid fa-utensils"></i></h1>
+                <div class="task-list" id="meals-container"></div>
+            </div>
+
+            <div id="tab-profile" class="tab-content">
+                <h1>Profilim <i class="fa-solid fa-user"></i></h1>
+                <div class="glass-card">
+                    <div style="display:flex; flex-direction:column; gap:0.5rem">
+                        <div><strong>Doğum Tarihi:</strong> <span id="prof-birthday">-</span></div>
+                        <div style="display:flex; justify-content:space-between">
+                            <div>Boy: <span id="prof-height">-</span> cm</div>
+                            <div>Kilo: <span id="prof-weight">-</span> kg</div>
+                        </div>
+                    </div>
+                    <div><strong>Hedef:</strong> Dambıl + Vücut ağırlığı</div>
+                    <button class="btn" style="background:var(--glass-bg); margin-top:1rem" onclick="resetProfile()">Planı Sıfırla</button>
+                </div>
+                <div class="glass-card" style="display:flex; justify-content:space-between">
+                    <div><i class="fa-solid fa-bell"></i> Bildirimler</div>
+                    <label class="toggle-switch"><input type="checkbox" id="notif-toggle" onchange="toggleNotifications()"><span class="slider"></span></label>
+                </div>
+                <div class="glass-card">
+                    <h3>📸 GIF Nasıl Eklenir?</h3>
+                    <p style="font-size:0.8rem">Egzersiz görseli için <strong>GIF URL'si</strong> kullanabilirsin. <code>exercisesDB</code> içindeki <strong>img</strong> alanına GIF linkini yapıştır.</p>
+                </div>
+                <button class="btn" style="background:rgba(239,68,68,0.1); color:var(--danger)" onclick="logout()">Çıkış Yap</button>
+                <p style="font-size:0.7rem; text-align:center; margin-top:1rem">📱 iPhone'da ana ekrana eklemek için: Paylaş → Ana Ekrana Ekle</p>
+            </div>
+
+            <nav class="bottom-nav">
+                <a class="nav-item active" onclick="switchTab('tab-home', this)"><i class="fa-solid fa-house"></i><span>Özet</span></a>
+                <a class="nav-item" onclick="switchTab('tab-workouts', this)"><i class="fa-solid fa-dumbbell"></i><span>Egzersiz</span></a>
+                <a class="nav-item" onclick="switchTab('tab-nutrition', this)"><i class="fa-solid fa-utensils"></i><span>Beslenme</span></a>
+                <a class="nav-item" onclick="switchTab('tab-profile', this)"><i class="fa-solid fa-user"></i><span>Profilim</span></a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- WORKOUT SESSION -->
+    <div id="workout-session" class="workout-session">
+        <button style="background:none; border:none; color:white; font-size:1.5rem; align-self:flex-start" onclick="closeWorkoutSession()"><i class="fa-solid fa-xmark"></i> Kapat</button>
+        <h2 id="session-exercise-name">Hazırlık</h2>
+        <img id="session-exercise-img" class="exercise-img" src="">
+        <div id="workout-main">
+            <div class="set-counter" id="set-counter">Set 1 / 3</div>
+            <div class="rep-display" id="rep-display">12 tekrar</div>
+            <div class="action-buttons">
+                <button class="btn-done" id="btn-done" onclick="completeSet(true)">✅ YAPTIM</button>
+                <button class="btn-fail" id="btn-fail" onclick="completeSet(false)">❌ YAPAMADIM</button>
+            </div>
+            <div id="rest-area" style="display:none" class="rest-timer">
+                <h3>💪 Biraz Dinlen</h3>
+                <div style="font-size:2rem; font-weight:bold;"><span id="rest-timer">90</span> saniye</div>
+                <i class="fa-solid fa-hourglass-half" style="font-size:1.5rem; margin-top:0.5rem"></i>
+            </div>
+        </div>
+        <div id="session-complete" style="display:none; text-align:center; padding:2rem">
+            <i class="fa-solid fa-trophy" style="font-size:3rem; color:var(--accent)"></i>
+            <h2>Antrenman Tamamlandı! 🎉</h2>
+            <button class="btn" onclick="finalizeWorkout()">Kapat</button>
+        </div>
+    </div>
+
+    <div id="warmup-overlay" class="warmup-overlay hide">
+        <h2>🔥 Isınma Zamanı!</h2>
+        <div id="warmup-exercise-name">Jumping Jack</div>
+        <img id="warmup-img" src="" style="width:200px; height:200px; object-fit:cover; border-radius:20px; margin:1rem">
+        <div class="warmup-timer" id="warmup-timer">60</div>
+        <button class="btn" onclick="skipWarmup()">Atla</button>
+    </div>
+
+    <div class="modal-overlay" id="exercise-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" style="background:none; border:none; float:right; font-size:1.5rem; color:white" onclick="closeModal(event)">✖</button>
+            <img src="" class="modal-image" id="modal-image">
+            <div class="modal-body-content">
+                <h3 id="modal-title">Hareket</h3>
+                <p id="modal-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================== BAŞLANGIÇ TARİHİ ========================
+        const START_DATE = new Date(2026, 4, 28); // 28 Mayıs 2026
+
+        // ======================== EGZERSİZ VERİTABANI (GIF'ler KORUNDU) ========================
+        const exercisesDB = {
+            jumping_jack: { title: "Jumping Jack (Isınma)", desc: "Zıplayarak ayakları aç-kapa, kollar yukarı. 60 saniye.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/JUMPING_JACK.gif" },
+            dumbbell_crunch: { title: "Dumbbell Crunch", desc: "Sırt üstü yat, dambılı göğüste tut, mekik çekerken yukarı it. 3x15 tekrar.", img: "https://gymvisual.com/img/p/2/1/8/1/7/21817.gif" },
+            dumbbell_chest_press: { title: "Dumbbell Chest Press", desc: "Sırt üstü yat (yerde veya bankta), dambılları göğüs hizasında yukarı it. 3x12 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_BP.gif" },
+            dumbbell_shoulder_press: { title: "Dumbbell Shoulder Press", desc: "Otur veya ayakta, dambılları omuz hizasında yukarı it. 3x12 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_SHD_PRESS-1.gif" },
+            overhead_dumbbell_extension: { title: "Overhead Dumbbell Extension", desc: "Tek dambılı baş üstünde iki elle tut, dirsekleri bükerek arkaya indir. 3x12 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_TRI_EXT.gif" },
+            dumbbell_row: { title: "Dumbbell Row", desc: "Tek kol ve diz bankta, dambılı yere doğru sarkıt, göğse çek. 3x12 tekrar (her kol).", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_LOW.gif" },
+            dumbbell_lunge: { title: "Dumbbell Lunge", desc: "İki elinde dambıllar, öne hamle yap, dizleri bük. 3x12 tekrar (her bacak).", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_SQT.gif" },
+            dumbbell_hip_thrust: { title: "Dumbbell Hip Thrust", desc: "Sırt bankta, dambılı leğen kemiği üzerinde, kalçayı yukarı it. 3x15 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/WEI_HIP_THRUST.gif" },
+            floor_press: { title: "Floor Press", desc: "Yere sırt üstü yat, dambılları yerde dirsekler yere değecek şekilde indir ve it. 3x12 tekrar.", img: "https://burnfit.io/wp-content/uploads/DB_BP.gif" },
+            overhead_press: { title: "Overhead Press (Dambıl)", desc: "Ayakta dambılları omuzlardan yukarı it, baş üstüne. 3x12 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/DB_SHD_PRESS-1.gif" },
+            pushup: { title: "Şınav (Push-up)", desc: "Düz kol plank pozisyonu, göğsü yere yaklaştır. Dizden yapabilirsin. 3x12 tekrar.", img: "https://burnfit.io/wp-content/uploads/PUSH_UP.gif" },
+            squat: { title: "Squat (Vücut ağırlığı)", desc: "Ayaklar omuz genişliğinde, sırt düz, çömel ve kalk. 3x20 tekrar.", img: "https://burnfit.io/wp-content/uploads/AIR_SQT-1.gif" },
+            plank: { title: "Plank", desc: "Dirsekler ve ayak uçlarında dur, karın kaslarını sık. 3x30 saniye.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/PLANK-2.gif" },
+            lunge: { title: "Lunge (Vücut ağırlığı)", desc: "Öne büyük adım at, iki diz 90°. Her bacak 3x12 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/LUNGE.gif" },
+            crunch: { title: "Crunch (Mekik)", desc: "Sırt üstü yat, dizler bükük, omuzları yerden kaldır. 3x20 tekrar.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/CRUNCH.gif" },
+            mountain_climber: { title: "Mountain Climber", desc: "Plank pozisyonunda dizleri göğse çek. 30 saniye x 3 set.", img: "https://burnfit.io/en/wp-content/uploads/sites/3/2026/01/MOUNT_CLIMB.gif" }
+        };
+
+        // Antrenman programı (16 hareket)
+        const workoutProgram = [
+            { key: "dumbbell_crunch", name: "Dumbbell Crunch", sets: 3, baseReps: 15, isTimed: false },
+            { key: "dumbbell_chest_press", name: "Dumbbell Chest Press", sets: 3, baseReps: 12, isTimed: false },
+            { key: "dumbbell_shoulder_press", name: "Dumbbell Shoulder Press", sets: 3, baseReps: 12, isTimed: false },
+            { key: "overhead_dumbbell_extension", name: "Overhead Extension", sets: 3, baseReps: 12, isTimed: false },
+            { key: "dumbbell_row", name: "Dumbbell Row", sets: 3, baseReps: 12, isTimed: false },
+            { key: "dumbbell_lunge", name: "Dumbbell Lunge", sets: 3, baseReps: 12, isTimed: false },
+            { key: "dumbbell_hip_thrust", name: "Dumbbell Hip Thrust", sets: 3, baseReps: 15, isTimed: false },
+            { key: "floor_press", name: "Floor Press", sets: 3, baseReps: 12, isTimed: false },
+            { key: "overhead_press", name: "Overhead Press", sets: 3, baseReps: 12, isTimed: false },
+            { key: "pushup", name: "Şınav", sets: 3, baseReps: 12, isTimed: false },
+            { key: "squat", name: "Squat", sets: 3, baseReps: 20, isTimed: false },
+            { key: "plank", name: "Plank", sets: 3, baseReps: 30, isTimed: true },
+            { key: "lunge", name: "Lunge", sets: 3, baseReps: 12, isTimed: false },
+            { key: "crunch", name: "Mekik", sets: 3, baseReps: 20, isTimed: false },
+            { key: "mountain_climber", name: "Mountain Climber", sets: 3, baseReps: 30, isTimed: true }
+        ];
+
+        const mealPlan = [
+            { id: "m1", title: "🥣 Kahvaltı", desc: "Yumurta, peynir, zeytin, tam buğday ekmeği, süt" },
+            { id: "m2", title: "🍎 Öğle", desc: "Izgara tavuklu salata veya köfte, bulgur pilavı" },
+            { id: "m3", title: "🍌 Ara Öğün", desc: "Muz, ceviz veya yoğurt" },
+            { id: "m4", title: "🥘 Akşam", desc: "Balık veya sebze yemeği, salata" }
+        ];
+
+        let userData = {
+            profile: null,
+            streak: 0,
+            lastCompletedDate: null,
+            currentDateStr: '',
+            meals: [],
+            workoutsDoneToday: 0,
+            history: {},
+            notificationsEnabled: false
+        };
+
+        let currentSession = {
+            active: false,
+            exerciseIndex: 0,
+            currentSet: 1,
+            currentReps: 0,
+            originalReps: 0,
+            isTimed: false,
+            restInterval: null
+        };
+
+        const CORRECT_PIN = "0623";
+        let currentPin = "";
+
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+        // ---------- BAŞLANGIÇ KONTROLÜ ----------
+        function isStarted() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            return today >= START_DATE;
+        }
+
+        function updateStartCountdown() {
+            if(!isStarted()) {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const diffTime = START_DATE - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const countdownEl = document.getElementById('start-countdown');
+                const workoutContent = document.getElementById('workout-content');
+                if(countdownEl) {
+                    countdownEl.style.display = 'block';
+                    document.getElementById('countdown-days').innerText = diffDays;
+                }
+                if(workoutContent) workoutContent.style.display = 'none';
+                const workoutsCountdown = document.getElementById('workouts-countdown');
+                const workoutsContainer = document.getElementById('workouts-container');
+                const workoutStartBtn = document.getElementById('workout-start-btn');
+                if(workoutsCountdown) { workoutsCountdown.style.display = 'block'; workoutsCountdown.innerHTML = `<div class="countdown-box"><i class="fa-solid fa-clock"></i> Başlangıca ${diffDays} gün kaldı (28 Mayıs 2026)</div>`; }
+                if(workoutsContainer) workoutsContainer.style.display = 'none';
+                if(workoutStartBtn) workoutStartBtn.style.display = 'none';
+                return false;
+            } else {
+                const countdownEl = document.getElementById('start-countdown');
+                const workoutContent = document.getElementById('workout-content');
+                if(countdownEl) countdownEl.style.display = 'none';
+                if(workoutContent) workoutContent.style.display = 'block';
+                const workoutsCountdown = document.getElementById('workouts-countdown');
+                const workoutsContainer = document.getElementById('workouts-container');
+                const workoutStartBtn = document.getElementById('workout-start-btn');
+                if(workoutsCountdown) workoutsCountdown.style.display = 'none';
+                if(workoutsContainer) workoutsContainer.style.display = 'block';
+                if(workoutStartBtn) workoutStartBtn.style.display = 'block';
+                return true;
+            }
+        }
+
+        // ---------- PIN ----------
+        function addPin(n) { if(currentPin.length<4) { currentPin+=n; updatePinUI(); } if(currentPin.length===4) setTimeout(checkPin,200); }
+        function deletePin() { currentPin=currentPin.slice(0,-1); updatePinUI(); }
+        function updatePinUI() { document.querySelectorAll('#pin-dots .dot').forEach((d,i)=>d.className='dot'+(i<currentPin.length?' filled':'')); }
+        function checkPin() { if(currentPin===CORRECT_PIN) { if(userData.profile) showView('view-main'); else showView('view-onboarding'); } else { document.querySelectorAll('.dot').forEach(d=>d.classList.add('error')); setTimeout(()=>{currentPin="";updatePinUI();},500); } }
+        function logout() { currentPin=""; updatePinUI(); showView('view-login'); }
+
+        function showView(vid) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(vid).classList.add('active'); if(vid==='view-main') { renderData(); switchTab('tab-home',document.querySelector('.nav-item.active')); updateStartCountdown(); } }
+        function switchTab(tabId, navEl) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if(navEl) { document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); navEl.classList.add('active'); } if(tabId==='tab-workouts') { updateStartCountdown(); renderWorkoutList(); } if(tabId==='tab-nutrition') renderMeals(); }
+
+        function saveProfile() {
+            const birthday = document.getElementById('birthday').value;
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+            if(!birthday||!height||!weight) return alert("Tüm alanları doldur");
+            userData.profile = { birthday, height, weight, goal: "all" };
+            generateDailyPlan();
+            saveState();
+            if(userData.notificationsEnabled) startReminderScheduler();
+            showView('view-main');
+        }
+
+        function resetProfile() { if(confirm("Plan silinsin?")) { userData.profile=null; saveState(); showView('view-onboarding'); } }
+
+        function generateDailyPlan() {
+            userData.meals = mealPlan.map(m=>({ id:m.id, done:false }));
+            userData.workoutsDoneToday = 0;
+            const today = getTodayStr();
+            if(!userData.history[today]) userData.history[today] = false;
+        }
+
+        function getTodayStr() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+        function checkNewDay() {
+            const today=getTodayStr();
+            if(userData.currentDateStr!==today) {
+                if(userData.profile) generateDailyPlan();
+                userData.currentDateStr=today;
+                if(userData.lastCompletedDate) { const diff=(new Date()-new Date(userData.lastCompletedDate))/(1000*3600*24); if(diff>1) userData.streak=0; }
+                saveState();
+            }
+        }
+
+        function renderData() {
+            document.getElementById('streak-count').innerText = userData.streak;
+            if(userData.profile) {
+                document.getElementById('prof-birthday').innerText = userData.profile.birthday;
+                document.getElementById('prof-height').innerText = userData.profile.height;
+                document.getElementById('prof-weight').innerText = userData.profile.weight;
+            }
+            document.getElementById('workout-counter-display').innerHTML = `🏋️ Bugün ${userData.workoutsDoneToday} / 2 antrenman tamamlandı`;
+            renderMeals();
+            renderWorkoutList();
+            updateProgress();
+            renderCalendar();
+            setGreeting();
+        }
+
+        function renderMeals() {
+            const c=document.getElementById('meals-container'); if(!c) return;
+            c.innerHTML='';
+            userData.meals.forEach(m=>{
+                const def=mealPlan.find(x=>x.id===m.id);
+                c.innerHTML+=`<div class="task-card ${m.done?'completed':''}" onclick="toggleMeal('${m.id}')">
+                    <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+                    <div class="task-content"><div class="task-title">${def.title}</div><div class="task-desc">${def.desc}</div></div></div>`;
+            });
+        }
+
+        function renderWorkoutList() {
+            const c=document.getElementById('workouts-container'); if(!c) return;
+            c.innerHTML='';
+            if(!isStarted()) return;
+            for(let i=0; i<2; i++) {
+                const done = userData.workoutsDoneToday > i;
+                c.innerHTML+=`<div class="task-card ${done?'completed':''}" onclick="if(!done) startFullWorkout()">
+                    <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+                    <div class="task-content"><div class="task-title">${i+1}. Antrenman Seansı</div><div class="task-desc">Tüm egzersizleri yap (16 hareket, 3 set)</div></div></div>`;
+            }
+        }
+
+        function toggleMeal(id) { const m=userData.meals.find(x=>x.id===id); if(m) m.done=!m.done; saveState(); renderMeals(); updateProgress(); checkAllCompleted(); }
+
+        function updateProgress() {
+            const mealsDone = userData.meals.filter(m=>m.done).length;
+            const workoutsDoneCount = Math.min(2, userData.workoutsDoneToday);
+            const total = userData.meals.length + 2;
+            const completed = mealsDone + workoutsDoneCount;
+            const percent = Math.round((completed/total)*100);
+            document.getElementById('progress-text').innerText = `${completed}/${total}`;
+            document.getElementById('progress-percent').innerText = percent+"%";
+            document.getElementById('progress-bar').style.width = percent+"%";
+        }
+
+        function renderCalendar() {
+            const row=document.getElementById('calendar-row'); if(!row) return;
+            row.innerHTML='';
+            const today=new Date();
+            for(let i=6;i>=0;i--) {
+                const d=new Date(today); d.setDate(d.getDate()-i);
+                const dStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                const dayNames=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+                const isComp = userData.history[dStr]===true;
+                row.innerHTML+=`<div class="cal-day ${isComp?'completed':''}">${dayNames[d.getDay()]}<span>${isComp?'✓':d.getDate()}</span></div>`;
+            }
+        }
+
+        function checkAllCompleted() {
+            const mealsDone = userData.meals.every(m=>m.done);
+            const workoutsDone = userData.workoutsDoneToday >= 2;
+            const allDone = mealsDone && workoutsDone;
+            const todayStr=getTodayStr();
+            if(allDone && userData.lastCompletedDate!==todayStr) {
+                userData.streak++;
+                userData.lastCompletedDate=todayStr;
+                userData.history[todayStr]=true;
+                saveState();
+                fireConfetti();
+                sendNotif("🎉 Mükemmel!","Bugün 2 antrenmanını da tamamladın!");
+                renderData();
+            } else if(!allDone && userData.lastCompletedDate===todayStr) {
+                userData.streak = Math.max(0,userData.streak-1);
+                userData.lastCompletedDate=null;
+                userData.history[todayStr]=false;
+                saveState();
+                renderData();
+            }
+        }
+
+        function setGreeting() { const h=new Date().getHours(); let g="Merhaba!"; if(h<12) g="Günaydın ☀️"; else if(h<18) g="İyi günler 🌤️"; else g="İyi akşamlar 🌙"; document.getElementById('greeting-text').innerText=g; }
+
+        // ----- ANTRENMAN -----
+        function startFullWorkout() {
+            if(!userData.profile) return;
+            if(!isStarted()) { alert("Antrenmanlar 28 Mayıs 2026'da başlıyor!"); return; }
+            if(userData.workoutsDoneToday >= 2) {
+                alert("Bugün 2 antrenman hakkını doldurdun! Yarın tekrar gel.");
+                return;
+            }
+            currentSession.active=true;
+            currentSession.exerciseIndex=0;
+            document.getElementById('workout-session').classList.add('active');
+            startWarmup();
+        }
+
+        function startWarmup() {
+            const warmupEx = { key:"jumping_jack", name:"Jumping Jack", duration:60 };
+            const overlay = document.getElementById('warmup-overlay');
+            document.getElementById('warmup-exercise-name').innerText = warmupEx.name;
+            document.getElementById('warmup-img').src = exercisesDB[warmupEx.key].img;
+            overlay.classList.remove('hide');
+            let timeLeft = 60;
+            const timerEl = document.getElementById('warmup-timer');
+            const interval = setInterval(()=>{
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+                if(timeLeft<=0) { clearInterval(interval); overlay.classList.add('hide'); startCurrentExercise(); }
+            },1000);
+            window._warmupInterval = interval;
+        }
+
+        function skipWarmup() { if(window._warmupInterval) clearInterval(window._warmupInterval); document.getElementById('warmup-overlay').classList.add('hide'); startCurrentExercise(); }
+
+        function startCurrentExercise() {
+            if(currentSession.exerciseIndex >= workoutProgram.length) {
+                finishAllExercises();
+                return;
+            }
+            const ex = workoutProgram[currentSession.exerciseIndex];
+            currentSession.currentSet = 1;
+            currentSession.originalReps = ex.baseReps;
+            currentSession.currentReps = ex.baseReps;
+            currentSession.isTimed = ex.isTimed;
+            updateSessionUI();
+        }
+
+        function updateSessionUI() {
+            const ex = workoutProgram[currentSession.exerciseIndex];
+            document.getElementById('session-exercise-name').innerText = `${ex.name} (Set ${currentSession.currentSet}/${ex.sets})`;
+            document.getElementById('session-exercise-img').src = exercisesDB[ex.key].img;
+            if(currentSession.isTimed) {
+                document.getElementById('rep-display').innerHTML = `${currentSession.currentReps} saniye`;
+            } else {
+                document.getElementById('rep-display').innerHTML = `${currentSession.currentReps} tekrar`;
+            }
+            document.getElementById('set-counter').innerText = `Set ${currentSession.currentSet} / ${ex.sets}`;
+            document.getElementById('workout-main').style.display = 'block';
+            document.getElementById('rest-area').style.display = 'none';
+            document.getElementById('session-complete').style.display = 'none';
+        }
+
+        function completeSet(success) {
+            if(!currentSession.active) return;
+            const ex = workoutProgram[currentSession.exerciseIndex];
+            if(!success) {
+                let newReps = Math.max(5, currentSession.currentReps - 5);
+                if(currentSession.isTimed) newReps = Math.max(15, newReps);
+                currentSession.currentReps = newReps;
+                alert(`Zorlandın, tekrar sayısı ${currentSession.currentReps} ${currentSession.isTimed?'saniye':'tekrar'} olarak ayarlandı. Tekrar dene!`);
+                updateSessionUI();
+                return;
+            }
+            if(currentSession.currentSet < ex.sets) {
+                currentSession.currentSet++;
+                currentSession.currentReps = ex.baseReps;
+                startRestTimer(90);
+            } else {
+                currentSession.exerciseIndex++;
+                if(currentSession.exerciseIndex < workoutProgram.length) {
+                    startRestTimer(90);
+                } else {
+                    finishAllExercises();
+                }
+            }
+        }
+
+        function startRestTimer(seconds) {
+            document.getElementById('workout-main').style.display = 'none';
+            const restDiv = document.getElementById('rest-area');
+            restDiv.style.display = 'block';
+            let remaining = seconds;
+            const timerSpan = document.getElementById('rest-timer');
+            timerSpan.innerText = remaining;
+            const interval = setInterval(()=>{
+                remaining--;
+                timerSpan.innerText = remaining;
+                if(remaining <= 0) {
+                    clearInterval(interval);
+                    restDiv.style.display = 'none';
+                    document.getElementById('workout-main').style.display = 'block';
+                    if(currentSession.exerciseIndex < workoutProgram.length) {
+                        startCurrentExercise();
+                    } else {
+                        finishAllExercises();
+                    }
+                }
+            },1000);
+            currentSession.restInterval = interval;
+        }
+
+        function finishAllExercises() {
+            if(currentSession.restInterval) clearInterval(currentSession.restInterval);
+            document.getElementById('workout-main').style.display = 'none';
+            document.getElementById('rest-area').style.display = 'none';
+            document.getElementById('session-complete').style.display = 'block';
+        }
+
+        function finalizeWorkout() {
+            if(userData.workoutsDoneToday < 2) {
+                userData.workoutsDoneToday++;
+                saveState();
+                renderData();
+                checkAllCompleted();
+                fireConfetti();
+                sendNotif("🏆 Antrenman tamam!", `Günde ${userData.workoutsDoneToday}/2 antrenman yaptın.`);
+            }
+            closeWorkoutSession();
+        }
+
+        function closeWorkoutSession() {
+            if(currentSession.restInterval) clearInterval(currentSession.restInterval);
+            if(window._warmupInterval) clearInterval(window._warmupInterval);
+            document.getElementById('warmup-overlay').classList.add('hide');
+            document.getElementById('workout-session').classList.remove('active');
+            currentSession.active = false;
+        }
+
+        function openExerciseModal(key) { const ex=exercisesDB[key]; if(ex) { document.getElementById('modal-image').src=ex.img; document.getElementById('modal-title').innerText=ex.title; document.getElementById('modal-text').innerText=ex.desc; document.getElementById('exercise-modal').classList.add('active'); } }
+        function closeModal(e) { document.getElementById('exercise-modal').classList.remove('active'); }
+
+        // ----- BİLDİRİMLER -----
+        function toggleNotifications() {
+            const enabled = document.getElementById('notif-toggle').checked;
+            if(enabled && Notification.permission !== 'granted') {
+                Notification.requestPermission().then(perm=>{
+                    if(perm==='granted') { userData.notificationsEnabled=true; saveState(); startReminderScheduler(); }
+                    else document.getElementById('notif-toggle').checked=false;
+                });
+            } else {
+                userData.notificationsEnabled = enabled;
+                saveState();
+                if(enabled) startReminderScheduler();
+            }
+        }
+
+        function startReminderScheduler() {
+            if(!userData.notificationsEnabled) return;
+            setInterval(()=>{
+                const now = new Date();
+                const hour = now.getHours();
+                const minute = now.getMinutes();
+                if(hour>=9 && hour<=21 && (minute===0 || minute===30) && isStarted()) {
+                    sendNotif("⏰ Antrenman zamanı!", `Günde 2 antrenman hedefine ulaşmak için şimdi başla! (Bugün ${userData.workoutsDoneToday}/2)`);
+                }
+            }, 60000);
+        }
+
+        function sendNotif(title, body) {
+            if(Notification.permission==='granted') {
+                navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,{body, icon:'https://img.icons8.com/fluency/96/dumbbell.png'}));
+            }
+        }
+
+        function fireConfetti() {
+            const canvas = document.getElementById('confetti'); const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = []; const colors=['#10b981','#3b82f6','#f59e0b','#ef4444'];
+            for(let i=0;i<100;i++) particles.push({ x:canvas.width/2, y:canvas.height/2, r:Math.random()*6+2, dx:Math.random()*10-5, dy:Math.random()*10-5, color:colors[Math.floor(Math.random()*colors.length)], life:1.0 });
+            function animate() {
+                ctx.clearRect(0,0,canvas.width,canvas.height); let active=false;
+                particles.forEach(p=>{ if(p.life>0) { active=true; p.x+=p.dx; p.y+=p.dy; p.dy+=0.2; p.life-=0.01; ctx.globalAlpha=p.life; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.color; ctx.fill(); } });
+                if(active) requestAnimationFrame(animate); else ctx.clearRect(0,0,canvas.width,canvas.height);
+            }
+            animate();
+        }
+
+        function saveState() { localStorage.setItem('fitnessAppDumbbell', JSON.stringify(userData)); }
+        function loadState() {
+            const data = localStorage.getItem('fitnessAppDumbbell');
+            if(data) { try { userData = JSON.parse(data); } catch(e){} }
+            if(!userData.history) userData.history={};
+            if(userData.workoutsDoneToday===undefined) userData.workoutsDoneToday=0;
+            if(!userData.meals) userData.meals=[];
+        }
+
+        loadState();
+        checkNewDay();
+        if(document.getElementById('notif-toggle')) document.getElementById('notif-toggle').checked = userData.notificationsEnabled;
+        if(userData.notificationsEnabled) startReminderScheduler();
+        showView('view-login');
+    </script>
+</body>
+</html>
